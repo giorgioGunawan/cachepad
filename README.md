@@ -1,4 +1,4 @@
-# cachepad
+# cachepad - cachepad.vercel.app
 notes that lives in your browser cache
 
 lost once you:
