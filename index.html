@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Cachepad</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            text-align: center;
+            background-color: #f2f2f2;
+        }
+
+        #container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            margin: 20px;
+        }
+
+        #note {
+            width: 80%;
+            height: 300px; /* Adjust the height as desired */
+            padding: 10px;
+        }
+
+        table {
+            margin: 20px auto;
+            border-collapse: collapse;
+            width: 80%;
+            background-color: #ffff;
+        }
+
+        table, th, td {
+            border: 1px solid #ccc;
+        }
+
+        th:first-child {
+            width: 20%; /* Set the width of the first th (Timestamp) to 20% */
+        }
+
+        th, td {
+            padding: 8px;
+            text-align: left;
+        }
+
+        td {
+            white-space: pre-line; /* Preserve newlines in table cells */
+        }
+
+        #buttons {
+            margin-top: 10px;
+        }
+
+        .button {
+            padding: 10px 20px;
+            background-color: #007bff;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            margin-right: 10px;
+        }
+
+        .button.cancel {
+            background-color: #ccc;
+        }
+    </style>
+</head>
+<body>
+    <h1><a href="https://github.com/giorgioGunawan/cachepad" target="_blank">Cachepad</a></h1>
+    <div id="container">
+        <textarea id="note" placeholder="Start typing..."></textarea>
+        <div id="buttons">
+            <button id="save" class="button">Save</button>
+            <button id="clear" class="button cancel">Clear All</button>
+        </div>
+    </div>
+
+    <h2>Saved Notes</h2>
+    <table id="noteTable">
+        <thead>
+            <tr>
+                <th>Timestamp</th>
+                <th>Notes</th>
+            </tr>
+        </thead>
+        <tbody id="noteList">
+        </tbody>
+    </table>
+
+    <script>
+        const noteTextarea = document.getElementById('note');
+        const saveButton = document.getElementById('save');
+        const clearButton = document.getElementById('clear');
+        const noteList = document.getElementById('noteList');
+
+        const savedNotes = JSON.parse(localStorage.getItem('notes')) || [];
+
+        function displayNotes() {
+            noteList.innerHTML = '';
+            savedNotes.forEach((noteObj, index) => {
+                const row = noteList.insertRow();
+                const timestampCell = row.insertCell(0);
+                const noteCell = row.insertCell(1);
+
+                const { timestamp, note } = noteObj;
+
+                const formattedTimestamp = new Date(timestamp).toLocaleDateString('en-US', {
+                    year: 'numeric',
+                    month: 'long',
+                    day: 'numeric',
+                    hour: '2-digit',
+                    minute: '2-digit',
+                    hour12: true,
+                });
+
+                timestampCell.textContent = formattedTimestamp;
+                noteCell.textContent = note;
+            });
+        }
+
+        displayNotes();
+
+        saveButton.addEventListener('click', () => {
+            const noteText = noteTextarea.value.trim();
+            if (noteText !== '') {
+                const timestamp = Date.now(); // Get the current timestamp
+                savedNotes.push({ timestamp, note: noteText });
+                localStorage.setItem('notes', JSON.stringify(savedNotes));
+                noteTextarea.value = '';
+                displayNotes();
+            }
+        });
+
+        clearButton.addEventListener('click', () => {
+            localStorage.removeItem('notes');
+            savedNotes.length = 0;
+            displayNotes();
+        });
+    </script>
+</body>
+</html>
